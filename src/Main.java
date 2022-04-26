@@ -19,7 +19,7 @@ public class Main {
     public static int[] tmpHundredThousand = new int[100000];
 
     // Decimal Format to Show Milliseconds
-    public static NumberFormat formatter = new DecimalFormat("#0.00000");
+    public static NumberFormat formatter = new DecimalFormat("#0.0000");
 
     public static void main(String[] args) {
         Scanner scanner= new Scanner(System.in);
@@ -27,12 +27,16 @@ public class Main {
 
         while(true){
             System.out.print(">> Give k Value for kthSmallest (k>=1): ");
-            k = scanner.nextInt();
 
-            if(k>=1)
-                break;
-            else
-                System.out.println("[!] The input must be greater than or equal to 1.");
+            try {
+                k = Integer.parseInt(scanner.nextLine());
+                if (k >= 1)
+                    break;
+                else
+                    System.out.println("[!] The input must be greater than or equal to 1.");
+            } catch (NumberFormatException e) {
+                System.out.println("[!] The input must be integer.");
+            }
         }
 
 
