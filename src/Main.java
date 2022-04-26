@@ -5,11 +5,11 @@ import java.util.Scanner;
 
 public class Main {
     // Arrays
-    public static int[] ten = new int[10];
-    public static int[] hundred = new int[100];
-    public static int[] thousand = new int[1000];
-    public static int[] tenThousand = new int[10000];
-    public static int[] hundredThousand = new int[100000];
+    public static int[] ten = createArray(10);
+    public static int[] hundred = createArray(100);
+    public static int[] thousand = createArray(1000);
+    public static int[] tenThousand = createArray(10000);
+    public static int[] hundredThousand = createArray(100000);
 
     // Temporary Arrays
     public static int[] tmpTen = new int[10];
@@ -22,12 +22,6 @@ public class Main {
     public static NumberFormat formatter = new DecimalFormat("#0.00000");
 
     public static void main(String[] args) {
-        createArray(ten);
-        createArray(hundred);
-        createArray(thousand);
-        createArray(tenThousand);
-        createArray(hundredThousand);
-
         Scanner scanner= new Scanner(System.in);
         int k;
 
@@ -63,10 +57,12 @@ public class Main {
         System.out.println("\n");
     }
 
-    public static int[] createArray(int[] array){
+    public static int[] createArray(int length){
+        int[] array = new int[length];
+
         Random random = new Random();
-        for(int i=0; i<array.length; i++)
-            array[i] = random.nextInt(array.length*10) + 1;
+        for(int i=0; i<length; i++)
+            array[i] = random.nextInt(length*10) + 1;
         return array;
     }
 
