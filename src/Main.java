@@ -86,6 +86,7 @@ public class Main {
     // Tests the array parameter it receives in all sorting algorithms and returns its measurements.
     public static void calculateTime(int[] array, int[] tmpArray, int k){
         long startTime;
+        long timeDifference=0;
         String totalTime;
         int kthSmallest = 0;
 
@@ -93,7 +94,7 @@ public class Main {
         copyArray(tmpArray,array);
         startTime = System.nanoTime();
         kthSmallest = quickSort(tmpArray, 0, array.length-1, k);
-        long timeDifference = System.nanoTime() - startTime;
+        timeDifference = System.nanoTime() - startTime;
         totalTime = formatter.format(timeDifference / Math.pow(10, 6));
 
         if(kthSmallest!=-1)
@@ -150,6 +151,19 @@ public class Main {
         else
             System.out.print("Selection Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
         //////////////////////////////
+
+
+        // QUICK SELECT ALGORITHM
+        copyArray(tmpArray,array);
+        startTime = System.nanoTime();
+        kthSmallest = quickSelect(tmpArray, 0, array.length-1 , k);
+        totalTime = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
+
+        if(kthSmallest!=-1)
+            System.out.print("Quick Select: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
+        else
+            System.out.print("Quick Select: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
+        //////////////////////////////
     }
 
     //////////////////////////////////////
@@ -170,6 +184,9 @@ public class Main {
     static int insertionSort(int array[], int k) {
         int length = array.length, temporary, j;
 
+        if(k>array.length)
+            return -1;
+
         for (int i = 1; i < length; i++) {
             temporary = array[i];
             for (j = i; j > 0; j--) {
@@ -181,9 +198,6 @@ public class Main {
             array[j] = temporary;
         }
 
-        if(k>array.length)
-            return -1;
-
         return array[k-1];
     }
 
@@ -192,6 +206,9 @@ public class Main {
     //////////////////////////////////////
 
     static int mergeSort(int array[], int lower, int upper, int k) {
+        if(k>array.length)
+            return -1;
+
         if (lower >= upper)
             return 0;
 
@@ -200,9 +217,6 @@ public class Main {
         mergeSort(array, lower, m, k);
         mergeSort(array, m + 1, upper, k);
         merge(array, lower, upper);
-
-        if(k>array.length)
-            return -1;
 
         return array[k-1];
     }
@@ -242,6 +256,9 @@ public class Main {
     //////////////////////////////////////
 
     static int quickSort(int[] array, int lower, int upper, int k){
+        if(k>array.length)
+            return -1;
+
         if(lower < upper){
             int p = partition(array, lower, upper);
             quickSort(array, lower, p-1, k);
@@ -259,6 +276,7 @@ public class Main {
                 swap(array, ++p, j);
 
         swap(array, lower, p);
+
         return p;
     }
 
@@ -269,6 +287,9 @@ public class Main {
     static int selectionSort(int array[], int k) {
         int length = array.length, position;
 
+        if(k>length)
+            return -1;
+
         for (int i = 0; i < length; i++) {
             position = i;
             for (int j = i + 1; j < length; j++) {
@@ -278,9 +299,6 @@ public class Main {
             swap(array, i, position);
         }
 
-        if(k>array.length)
-            return -1;
-
         return array[k-1];
     }
 
@@ -289,15 +307,15 @@ public class Main {
     //////////////////////////////////////
 
     static int heapSort(int array[], int k) {
+        if(k>array.length)
+            return -1;
+
         makeMaxHeap(array);
 
         for (int i = array.length - 1; i > 0; i--) {
             swap(array, i, 0);
             heapAdjust(array, 0, i);
         }
-
-        if(k>array.length)
-            return -1;
 
         return array[k-1];
     }
@@ -324,5 +342,34 @@ public class Main {
         }
 
         array[(j - 1) / 2] = temporary;
+    }
+
+    //////////////////////////////////////
+    ////////// QUICK SELECT //////////////
+    //////////////////////////////////////
+
+    public static int quickSelect(int[] array, int low,
+                                  int high, int k)
+    {
+        if(k>array.length)
+            return -1;
+
+        // find the partition
+        int partition = partition(array, low, high);
+
+        // if partition value is equal to the kth position,
+        // return value at k.
+        if (partition == k - 1)
+            return array[partition];
+
+        // if partition value is less than kth position,
+        // search right side of the array.
+        else if (partition < k - 1)
+            return quickSelect(array, partition + 1, high, k);
+
+        // if partition value is more than kth position,
+        // search left side of the array.
+        else
+            return quickSelect(array, low, partition - 1, k);
     }
 }
