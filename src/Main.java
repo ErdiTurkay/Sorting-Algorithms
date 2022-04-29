@@ -177,6 +177,18 @@ public class Main {
         array[j] = temporary;
     }
 
+    static int partition(int[] array, int lower, int upper){
+        int p = lower, j;
+
+        for(j=lower+1; j <= upper; j++)
+            if(array[j] < array[lower])
+                swap(array, ++p, j);
+
+        swap(array, lower, p);
+
+        return p;
+    }
+
     //////////////////////////////////////
     ////////// INSERTION SORT ////////////
     //////////////////////////////////////
@@ -266,18 +278,6 @@ public class Main {
         }
 
         return array[k-1];
-    }
-
-    static int partition(int[] array, int lower, int upper){
-        int p = lower, j;
-
-        for(j=lower+1; j <= upper; j++)
-            if(array[j] < array[lower])
-                swap(array, ++p, j);
-
-        swap(array, lower, p);
-
-        return p;
     }
 
     //////////////////////////////////////
