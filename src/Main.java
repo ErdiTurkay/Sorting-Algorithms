@@ -348,14 +348,14 @@ public class Main {
     ////////// QUICK SELECT //////////////
     //////////////////////////////////////
 
-    public static int quickSelect(int[] array, int low,
-                                  int high, int k)
+    public static int quickSelect(int[] array, int lower,
+                                  int upper, int k)
     {
         if(k>array.length)
             return -1;
 
         // find the partition
-        int partition = partition(array, low, high);
+        int partition = partition(array, lower, upper);
 
         // if partition value is equal to the kth position,
         // return value at k.
@@ -365,11 +365,11 @@ public class Main {
         // if partition value is less than kth position,
         // search right side of the array.
         else if (partition < k - 1)
-            return quickSelect(array, partition + 1, high, k);
+            return quickSelect(array, partition + 1, upper, k);
 
         // if partition value is more than kth position,
         // search left side of the array.
         else
-            return quickSelect(array, low, partition - 1, k);
+            return quickSelect(array, lower, partition - 1, k);
     }
 }
