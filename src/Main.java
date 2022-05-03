@@ -164,6 +164,18 @@ public class Main {
         else
             System.out.print("Quick Select: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
         //////////////////////////////
+
+        // QUICK SELECT (median-of-three) ALGORITHM
+        copyArray(tmpArray,array);
+        startTime = System.nanoTime();
+        kthSmallest = quickSelect3(tmpArray, 0, array.length-1 , k);
+        totalTime = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
+
+        if(kthSmallest!=-1)
+            System.out.print("Quick Select (median-of-three): \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
+        else
+            System.out.print("Quick Select (median-of-three): \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
+        //////////////////////////////
     }
 
     //////////////////////////////////////
@@ -371,5 +383,69 @@ public class Main {
         // search left side of the array.
         else
             return quickSelect(array, lower, partition - 1, k);
+    }
+
+    //////////////////////////////////////
+    /// QUICK SELECT (median-of-three) ///
+    //////////////////////////////////////
+
+    public static int quickSelect3(int[] array, int lower,
+                                  int upper, int k)
+    {
+        if(k>array.length)
+            return -1;
+
+        // find the partition
+        int partition = partition3(array, lower, upper);
+
+        // if partition value is equal to the kth position,
+        // return value at k.
+        if (partition == k - 1)
+            return array[partition];
+
+        // if partition value is less than kth position,
+        // search right side of the array.
+        else if (partition < k - 1)
+            return quickSelect3(array, partition + 1, upper, k);
+
+        // if partition value is more than kth position,
+        // search left side of the array.
+        else
+            return quickSelect3(array, lower, partition - 1, k);
+    }
+
+    public static int partition3(int[] array, int lower, int upper){
+        int p = pivot(array, lower, upper);
+
+        swap(array, lower, p);
+
+        int j = upper + 1;
+        int i = lower;
+        while(true){
+
+            while(array[lower] < array[--j])
+                if(j==lower)   break;
+
+            while(array[++i] < array[lower])
+                if(i==upper) break;
+
+            if(i >= j)  break;
+            swap(array, i, j);
+        }
+        swap(array, lower, j);
+        return j;
+    }
+
+    public static int pivot(int[] array, int lower, int upper){
+        int mid = (lower+upper)/2;
+        int pivot = array[lower] + array[upper] + array[mid] -
+                Math.min(Math.min(array[lower], array[upper]), array[mid]) -
+                Math.max(Math.max(array[lower], array[upper]), array[mid]);
+
+        if(pivot == array[lower])
+            return lower;
+        else if(pivot == array[upper])
+            return upper;
+        return mid;
     }
 }
