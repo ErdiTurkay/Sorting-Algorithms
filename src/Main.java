@@ -1,7 +1,8 @@
+import com.sun.deploy.util.ArrayUtil;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     // Arrays
@@ -78,6 +79,14 @@ public class Main {
         return array;
     }
 
+    public static int[] setSameValue(int[] array, int value){
+        for(int i=0; i<array.length; i++){
+            array[i] = value;
+        }
+
+        return array;
+    }
+
     // Copies an array with its contents into another array.
     private static void copyArray(int[] temp, int[] array){
         System.arraycopy(array, 0, temp, 0, array.length);
@@ -87,7 +96,7 @@ public class Main {
     public static void calculateTime(int[] array, int[] tmpArray, int k){
         long startTime;
         long timeDifference=0;
-        String totalTime;
+        String totalTime, totalTimeBest, totalTimeWorst;
         int kthSmallest = 0;
 
         // QUICK SORT ALGORITHM
@@ -97,20 +106,37 @@ public class Main {
         timeDifference = System.nanoTime() - startTime;
         totalTime = formatter.format(timeDifference / Math.pow(10, 6));
 
-        if(kthSmallest!=-1)
-            System.out.print("Quick Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
-        else
+        Arrays.stream(tmpArray).sorted();
+
+        startTime = System.nanoTime();
+        kthSmallest = quickSort(tmpArray, 0, array.length-1, k);
+        timeDifference = System.nanoTime() - startTime;
+        totalTimeWorst = formatter.format(timeDifference / Math.pow(10, 6));
+
+        if(kthSmallest==0)
+            System.out.print("Quick Sort: Stack Error!");
+        if(kthSmallest==-1)
             System.out.print("Quick Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
+        else
+            System.out.print("Quick Sort: \n\t" + totalTime + " ms - Worst: " + totalTimeWorst + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
         //////////////////////////////
 
         // HEAP SORT ALGORITHM
         copyArray(tmpArray,array);
+
         startTime = System.nanoTime();
         kthSmallest = heapSort(tmpArray, k);
         totalTime = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
 
+        // For the best case we make all the elements the same number.
+        setSameValue(tmpArray, kthSmallest);
+
+        startTime = System.nanoTime();
+        kthSmallest = heapSort(tmpArray, k);
+        totalTimeBest = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
+
         if(kthSmallest!=-1)
-            System.out.print("Heap Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
+            System.out.print("Heap Sort: \n\t" + totalTime + " ms - Best: " + totalTimeBest + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
         else
             System.out.print("Heap Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
         //////////////////////////////
@@ -121,8 +147,16 @@ public class Main {
         kthSmallest = mergeSort(tmpArray, 0, array.length-1, k);
         totalTime = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
 
+        // For the best case we order the array.
+        Arrays.stream(tmpArray).sorted();
+
+        startTime = System.nanoTime();
+        kthSmallest = mergeSort(tmpArray, 0, array.length-1, k);
+        totalTimeBest = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
+
+
         if(kthSmallest!=-1)
-            System.out.print("Merge Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
+            System.out.print("Merge Sort: \n\t" + totalTime + " ms - " + " Best: " + totalTimeBest + " ms | " + k + "th Smallest Element: "+kthSmallest+"\n");
         else
             System.out.print("Merge Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
         //////////////////////////////
@@ -133,8 +167,17 @@ public class Main {
         kthSmallest = insertionSort(tmpArray, k);
         totalTime = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
 
+        // For the best case we order the array.
+        Arrays.stream(tmpArray).sorted();
+
+        startTime = System.nanoTime();
+        kthSmallest = insertionSort(tmpArray, k);
+        totalTimeBest = formatter.format((System.nanoTime() - startTime) / Math.pow(10, 6));
+
+
+
         if(kthSmallest!=-1)
-            System.out.print("Insertion Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
+            System.out.print("Insertion Sort: \n\t" + totalTime + " ms - " + "Best: " + totalTimeBest + " ms | " + k +  "th Smallest Element: "+kthSmallest+"\n");
         else
             System.out.print("Insertion Sort: \n\t" + totalTime + " ms | " + k +  "th Smallest Element: Out of Bounds Array\n");
         //////////////////////////////
@@ -284,9 +327,15 @@ public class Main {
             return -1;
 
         if(lower < upper){
-            int p = partition(array, lower, upper);
-            quickSort(array, lower, p-1, k);
-            quickSort(array, p+1, upper, k);
+
+            try {
+                int p = partition(array, lower, upper);
+                quickSort(array, lower, p - 1, k);
+                quickSort(array, p + 1, upper, k);
+            }
+            catch (StackOverflowError e){
+                return 0;
+            }
         }
 
         return array[k-1];
@@ -366,20 +415,20 @@ public class Main {
         if(k>array.length)
             return -1;
 
-        // find the partition
+        // Find the partition
         int partition = partition(array, lower, upper);
 
-        // if partition value is equal to the kth position,
+        // If partition value is equal to the kth position,
         // return value at k.
         if (partition == k - 1)
             return array[partition];
 
-        // if partition value is less than kth position,
+        // If partition value is less than kth position,
         // search right side of the array.
         else if (partition < k - 1)
             return quickSelect(array, partition + 1, upper, k);
 
-        // if partition value is more than kth position,
+        // If partition value is more than kth position,
         // search left side of the array.
         else
             return quickSelect(array, lower, partition - 1, k);
@@ -395,20 +444,20 @@ public class Main {
         if(k>array.length)
             return -1;
 
-        // find the partition
+        // Find the partition
         int partition = partition3(array, lower, upper);
 
-        // if partition value is equal to the kth position,
+        // If partition value is equal to the kth position,
         // return value at k.
         if (partition == k - 1)
             return array[partition];
 
-        // if partition value is less than kth position,
+        // If partition value is less than kth position,
         // search right side of the array.
         else if (partition < k - 1)
             return quickSelect3(array, partition + 1, upper, k);
 
-        // if partition value is more than kth position,
+        // If partition value is more than kth position,
         // search left side of the array.
         else
             return quickSelect3(array, lower, partition - 1, k);
