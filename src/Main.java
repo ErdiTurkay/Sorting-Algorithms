@@ -106,6 +106,7 @@ public class Main {
         timeDifference = System.nanoTime() - startTime;
         totalTime = formatter.format(timeDifference / Math.pow(10, 6));
 
+        // For the worst case we order the array.
         Arrays.stream(tmpArray).sorted();
 
         startTime = System.nanoTime();
